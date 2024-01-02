@@ -1,0 +1,13 @@
+servizio mail
+    props:
+        name
+        type
+        id
+        params
+
+    autenticazione()
+    sandEmail
+    encodeMessage
+    createMail -> createMailFromTemplate
+    getTemplateByID
+    
