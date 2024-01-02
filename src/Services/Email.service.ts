@@ -1,59 +1,52 @@
-import GoogleEmailService from '@Services/EmailServices/gmail/service.service'
-import { readdirSync } from 'fs'
-import path from 'path'
-import { SandEmailArgs } from 'src/types'
+import EventEmitter from "events";
+import Services from "src/Entities/Services.entity";
+import ServiceModel from '@Entities/Services.entity'
+import { database } from "src/DataSources";
+import { Repository } from "typeorm";
+import MailComposer from 'nodemailer/lib/mail-composer'
 
-
-class EmailService  {
-    googleEmailService: GoogleEmailService
-    constructor() {
-        this.googleEmailService = new GoogleEmailService(
-            process.env.GOOGLE_CLIENT_ID as string,
-            process.env.GOOGLE_CLIENT_SECRET as string,
-            process.env.GOOGLE_REFRESH_TOKEN as string,
-            process.env.GOOGLE_EMAIL as string,
-            process.env.GOOGLE_PASS as string
-        )
-    }
-
-    initServices() {
-
-    }
-
-    async sandEmail({
-        name,
-        email,
-        number,
-        text,
-        subject,
-        service_type
-    }: SandEmailArgs) {
-        const transporter = await this.googleEmailService.createTransporter()
-        if(!transporter) return 
-
-        await this.googleEmailService.sandEmail()
-
-/*         try {
-            await transporter.sendMail({
-                from: 'moccia.ant@gmail.com',
-                to: 'moccia.ant@gmail.com',
-                html: `
-            <h4>Nuova email da: </h4> ${name}<br />    
-            <h4>email: </h4> ${email}<br />
-            <h4>phon number: </h4> ${number}<br />
-            <br />
-            <h1> Testo email </h1><br />              
-            <p>${text}</p>`,
-                subject: `${subject}`
-            });
-            return {
-                message: 'email sanded'
-            }
-        } catch (error) {
-            throw new Error('qualcosa è andato storto')
-        }
-        */
-    } 
+type EmailServiceParams = {
+    id_service?: string
 }
 
+
+class EmailService<AuthParams> extends EventEmitter {
+    public service_type: string
+    public service_name: string
+    public id_service?: string
+    public serviceModel: ServiceModel<AuthParams>
+    public serviceRepository: Repository<ServiceModel<AuthParams>>
+    constructor({
+        id_service
+    }: EmailServiceParams = {}) {
+        super();
+        this.serviceModel = new ServiceModel<AuthParams>()
+        this.id_service = id_service ? id_service : undefined
+        this.serviceRepository = database.getRepository(ServiceModel<AuthParams>)
+        this.service_name = 'gmail'
+    }
+
+    sandMail() { }
+
+    async getServiceInfo() {
+        const serviceInfo: Services<AuthParams> | null = await this.serviceRepository.findOne({
+            where: {
+                id_service: this.id_service
+            }
+        })
+
+        return serviceInfo
+    }
+    encodeMessage(message: any) {
+        return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    authenticate(_AuthParams:AuthParams): any {
+            return new Error("Override authenticate() method with your logic")
+    }
+    async createMail(options: any) {
+        const mailComposer = new MailComposer(options);
+        const message = await mailComposer.compile().build();
+        return this.encodeMessage(message);
+    };
+}
 export default EmailService

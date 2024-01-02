@@ -10,7 +10,7 @@ class Services<T> {
 
     @Column()
     service_type: string
-
+    
     @Column({ type: 'json' })
     authParams: T
 }

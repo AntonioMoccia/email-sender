@@ -7,11 +7,12 @@ import { database } from "./DataSources"
 import Auth from "@Services/Auth.service"
 import EmailServicesManager from '@Services/EmailServicesManager.service'
 import path from 'path'
-
+import EmailRouter from '@Routers/Email.router'
 declare global {
     namespace Express {
         interface Request {
-            auth: Auth
+            auth: Auth,
+            internalParams:any
         }
     }
 }
@@ -25,7 +26,7 @@ async function InitDatabase() {
 app.post('/service/google',async(req:Request,res:Response)=>{
     
 })
-
+app.use('/email',EmailRouter)
 
 const InitServicesMiddelware = async (req: Request, res: Response, next: NextFunction) => {
     const auth = new Auth(req)
