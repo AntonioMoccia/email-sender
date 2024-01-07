@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../google-auth"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../passport"
+		}
+	],
+	"settings": {}
+}

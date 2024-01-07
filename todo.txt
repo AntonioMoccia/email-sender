@@ -11,3 +11,81 @@ servizio mail
     createMail -> createMailFromTemplate
     getTemplateByID
     
+
+
+******************************************02/01/2024********************************************************************
+
+
+    /service
+    authentication
+    authenticate
+    sandEmail
+    serviceInfo
+    saveService
+    updateService
+
+/email
+    sandEmail
+
+/template
+    
+
+----------------------------------------------------------------------------------------------
+
+Service{
+
+    constructor({id_service?})
+    
+    service_id
+    service_type
+    authenticate
+    sandEmail
+        authenticate
+        Template.createEmailFromTemplate
+        sandEmail 
+        this.authClient = refreshToken 
+        this.updateTokensOnDatabase
+    is_authenticated > boolean
+    updateTokensOnDatabase(id_service,{access_token,refresh_token})
+    updateService(id_service,{ params })
+    saveService(service)
+    authParams: es. {
+        access_token:"jkbsadkfbsd",
+        refresh_token
+    }
+}
+
+Email{
+
+}
+
+Template{
+
+}
+
+
+
+**************************07/01/2024*************************************
+
+Email   
+    provider
+    name
+    id_service
+    email
+
+
+        authenticate
+        sandEmail
+        save
+        update
+        serviceInfo
+        createMail -> encodeMessage
+    
+gmail
+    getToken
+    getTokensByCode
+    generateAuthUrl
+    generateAuthUrlExistingService
+    @over
+        sandEmail
+        authenticate

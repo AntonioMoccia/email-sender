@@ -6,12 +6,17 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 class Services<T> {
 
     @PrimaryGeneratedColumn('uuid')
-    id_service: string
+    id_service?: string
 
     @Column()
-    service_type: string
+    email:string
+
+    @Column({
+        nullable:false
+    })
+    provider: string
     
-    @Column({ type: 'json' })
+    @Column({ type: 'jsonb' })
     authParams: T
 }
 export default Services

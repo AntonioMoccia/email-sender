@@ -5,9 +5,9 @@ import express, { Application, Request, Response, NextFunction } from 'express'
 import dns from 'dns'
 import { database } from "./DataSources"
 import Auth from "@Services/Auth.service"
-import EmailServicesManager from '@Services/EmailServicesManager.service'
 import path from 'path'
 import EmailRouter from '@Routers/Email.router'
+
 declare global {
     namespace Express {
         interface Request {
@@ -45,12 +45,6 @@ const hosts: string[] = [
 
 
 app.post('/sand-email', async (req: Request, res: Response) => {
-
-    const servicesManager = new EmailServicesManager({
-        servicesRootFolder:path.resolve(__dirname,'Services','EmailServices')
-    })
-    servicesManager.readRootFolder()
-    
 
     res.send('hello world')
 })
