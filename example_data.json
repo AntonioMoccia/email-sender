@@ -1,0 +1,149 @@
+{
+    "id": 163595,
+    "settings": {
+        "email": "moccia.ant@gmail.com",
+        "allowApi": true,
+        "strictApi": true,
+        "defaultService": "service_4zoitph"
+    },
+    "removeAt": null,
+    "subscription": {
+        "id": "free",
+        "max": 200,
+        "period": "month",
+        "resetAt": "2024-01-09",
+        "cancelAt": null,
+        "remaining": 200
+    },
+    "keys": {
+        "user_UdXUyuJokIsW4SyplhL0Q": {
+            "name": "Default",
+            "publicKey": "user_UdXUyuJokIsW4SyplhL0Q",
+            "privateKey": "f484b5a42b6da273d5e730ae4d48f2e7"
+        }
+    },
+    "users": {
+        "163589": {
+            "id": 163589,
+            "mfa": null,
+            "name": "AntonioMoccia",
+            "email": "moccia.ant@gmail.com",
+            "isVerified": 1,
+            "permissions": [
+                "account",
+                "service",
+                "template"
+            ]
+        }
+    },
+    "records": {
+        "sservice_4zoitph": {
+            "id": "service_4zoitph",
+            "data": {
+                "id": "service_4zoitph",
+                "name": "Gmail",
+                "email": "moccia.ant@gmail.com",
+                "provider": "Gmail_API",
+                "access_token": "ya29.a0AbVbY6OTdeF3NGqbGbSowtp3NnH1VQ4Dd9HUYS57k6O09WkzVlQwtdXmJEWR5n5D4P_md8k3q9TEXUONVKIWyjMPNfyWLGJE7V_UhEY-vGsxg6LnfbJJX05PDr3_wNai5uDJmEahlSJkPyigAD4aIxw_7H7AaCgYKAaoSARESFQFWKvPldSwhUaHF-OApVwFFFu2LOw0163",
+                "refresh_token": "1//06VqyUIIg-yOVCgYIARAAGAYSNwF-L9IropaaCAHHMNOYBF4O1ILq-_tjkR0G69MY8p4z4nb3X0OxSjYoIsh3Z9lRFxiUSKjdwPQ"
+            },
+            "type": "s",
+            "createdAt": "2023-07-06 19:15:37.000000"
+        },
+        "sservice_ba7am0k": {
+            "id": "service_ba7am0k",
+            "data": {
+                "id": "service_ba7am0k",
+                "host": "smtps.aruba.it",
+                "name": "info",
+                "port": "465",
+                "email": "info@gbfilms.it",
+                "secure": true,
+                "password": "Sitodrone00!",
+                "provider": "SMTP"
+            },
+            "type": "s",
+            "createdAt": "2023-07-13 08:11:28.000000"
+        },
+        "sservice_dni1ubt": {
+            "id": "service_dni1ubt",
+            "data": {
+                "id": "service_dni1ubt",
+                "host": "smtps.aruba.it",
+                "name": "info@gbfilms.it",
+                "port": "465",
+                "email": "info@gbfilms.it",
+                "secure": true,
+                "password": "Sitodrone00!",
+                "provider": "SMTP"
+            },
+            "type": "s",
+            "createdAt": "2022-06-19 19:25:14.000000"
+        },
+        "ttemplate_d4jofju": {
+            "id": "template_d4jofju",
+            "data": {
+                "id": "template_d4jofju",
+                "name": "Alberino",
+                "captcha": false,
+                "content": "<p>Ciao Alberino,</p>\n<p>Hai un nuovo messaggio da {{from_name}}:</p>\n<p style=\"padding: 12px; border-left: 4px solid #d0d0d0; font-style: italic;\">{{message}}</p>",
+                "subject": "Nuovo messaggio da {{from_name}}",
+                "reply_to": "info@gbdrone.it",
+                "to_email": "info@gbdrone.it",
+                "from_name": "AntonioMoccia",
+                "meta_only": false,
+                "system_id": "o2tpetm",
+                "auto_reply": false,
+                "from_email": "{{user_email}}",
+                "add_contact": false,
+                "attachments": [],
+                "google_analytics": {},
+                "auto_reply_params": {
+                    "content": "",
+                    "subject": "",
+                    "to_email": "",
+                    "from_email": "",
+                    "use_default_from_email": true
+                },
+                "add_contact_params": {},
+                "static_attachments": [],
+                "use_default_from_email": false
+            },
+            "type": "t",
+            "createdAt": "2022-06-20 17:30:20.000000"
+        },
+        "ttemplate_eeipv81": {
+            "id": "template_eeipv81",
+            "data": {
+                "id": "template_eeipv81",
+                "name": "My Default Template",
+                "captcha": false,
+                "content": "<p>Ciao Gbfilms,</p>\n<p>Hai un nuovo messaggio da {{from_name}}:</p>\n<p style=\"padding: 12px; border-left: 4px solid #d0d0d0; font-style: italic;\">{{message}}</p>\n<p>indirizzo email mittente: {{user_email}}</p>",
+                "subject": "Nuovo messaggio da {{from_name}}",
+                "reply_to": "",
+                "to_email": "info@gbfilms.it",
+                "from_name": "{{from_name}}",
+                "meta_only": false,
+                "system_id": "vbpg6we",
+                "auto_reply": false,
+                "from_email": "moccia.ant@gmailcom",
+                "add_contact": false,
+                "attachments": [],
+                "google_analytics": {},
+                "auto_reply_params": {
+                    "content": "",
+                    "subject": "",
+                    "to_email": "",
+                    "from_email": "",
+                    "use_default_from_email": true
+                },
+                "add_contact_params": {},
+                "static_attachments": [],
+                "use_default_from_email": true
+            },
+            "type": "t",
+            "createdAt": "2022-06-19 19:25:14.000000"
+        }
+    },
+    "user": 163589
+}
