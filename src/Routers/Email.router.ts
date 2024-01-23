@@ -4,6 +4,9 @@ import { Router } from 'express'
 export const basePath = '/'
 export const router = Router()
 
+// /email/sand/
+
+
 /**Sand email with provider authenticated */
 router.post('/sand/:service/sand-email', EmailController.sandEmail)
 

@@ -1,13 +1,22 @@
-import GmailService from "@Services/EmailServices/gmail"
-import { Request, Response } from "express"
+import { Request, Response, NextFunction, Router } from 'express'
+import GmailService from "@Services/providers/gmail/service"
 
+interface ProviderController {
+    sandEmail: (req: Request, res: Response, next: NextFunction) => void,
+    login: (req: Request, res: Response, next: NextFunction) => void
+}
 
+class GmailController implements ProviderController {
 
-class EmailController {
-    constructor() { }
+    gmailService: GmailService
 
-    static async sandEmail(req: Request, res: Response): Promise<void> {
-
+    constructor() {
+        this.gmailService = new GmailService()
+    }
+    hello(req: Request, res: Response, next: NextFunction) {
+        res.send('Hello to Gmail Provider')
+    }
+    async sandEmail(req: Request, res: Response, next: NextFunction) {
         const initService = new GmailService({ id_service: req.params.service })
 
         const serviceInfo = await initService.getServiceInfo()
@@ -24,23 +33,24 @@ class EmailController {
             refresh_token: String(serviceInfo?.authParams.refresh_token)
         })
         /**Here are user info like email address */
-        const userInfo = await initService.getUserInfo(String(serviceInfo?.authParams.access_token))
-        const tokenInfo = await initService.getToken(String(serviceInfo?.authParams.access_token))
+        try {
+            const tokenInfo = await initService.getToken(String(serviceInfo?.authParams.access_token))
+        } catch (error) {
+            initService.refreshToken()
+        }
 
 
         const sand = await initService.sandEmail()
-        console.log('provider', initService.provider);
 
         res.json(sand)
     }
-    static async login(req: Request, res: Response): Promise<void> {
+    login(req: Request, res: Response, next: NextFunction) {
         const service = new GmailService()
         const authUrl = service.generateAuthUrl(req.params.id_service)
-       
-        res.json({ url: authUrl })
 
+        res.json({ url: authUrl })
     }
-    static async redirect(req: Request, res: Response): Promise<void> {
+    async redirect(req: Request, res: Response, next: NextFunction) {
         const service_id = req.query.state ? JSON.parse(String(req.query.state)).service_id : undefined
         const gmailService = new GmailService()
 
@@ -73,4 +83,6 @@ class EmailController {
         }
     }
 }
-export default EmailController
+
+export default GmailController
+

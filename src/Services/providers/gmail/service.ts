@@ -1,6 +1,7 @@
 import { google, Auth } from "googleapis"
 import Services from "src/Entities/Services.entity";
 import EmailService from "@Services/Email.service";
+import { Application } from "express";
 
 const OAuth2 = google.auth.OAuth2;
 type AuthParamsGoogle = {
@@ -21,60 +22,78 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
     private oauth2Client: Auth.OAuth2Client
     public id_service?: string
     public is_authenticated?: boolean
+    public app: Application
 
     constructor({
-        id_service
+        id_service,
     }: GoogleEmailServiceParams = {}) {
         super()
         this.id_service = id_service ? id_service : undefined
 
-        this.name = 'Gmail'
+
         this.oauth2Client = new OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
             "http://127.0.0.1:5000/email/sand/login/google/oauth"
         )
-    }
+        // console.log(this.getBaseUrl());
 
-    async getToken(access_token: string) {
-        const newAccessToken = await this.oauth2Client.getAccessToken()
-        const userInfo = await this.getUserInfo(String(newAccessToken.token))
-        const tokenInfo = await this.oauth2Client.getTokenInfo(String(newAccessToken.token))
-        console.log('user info ', userInfo);
-
-        return tokenInfo
     }
-    async sandEmail() {
-        if (!this.is_authenticated) return new Error("you are not authenticated")
+    async refreshToken(): Promise<Auth.Credentials | any> {
         try {
 
-            /** CREATE EMAIL RAW AND SAND */
-            const options = {
-                to: 'moccia.ant@gmail.com',
-                cc: '',
-                replyTo: '',
-                subject: 'Hello Amit 🚀',
-                text: 'This email is sent from the command line',
-                html: `<p>🙋🏻‍♀️  &mdash; This is a <b>test email</b> from <a href="https://digitalinspiration.com">Digital Inspiration</a>.</p>`,
-                textEncoding: 'base64',
-                headers: [
-                    { key: 'X-Application-Developer', value: 'Amit Agarwal' },
-                    { key: 'X-Application-Version', value: 'v1.0.0.2' },
-                ]
-            }
-            const rawMessage = await this.createMail(options);
-            const sandEmail = await google.gmail({ version: 'v1', auth: this.oauth2Client }).users.messages.send({
-                userId: 'me',
-                requestBody: {
-                    raw: rawMessage
-                }
-            })
-
-            return sandEmail.status
-
+            const refreshToken = await this.oauth2Client.refreshAccessToken()
+            return refreshToken.credentials
         } catch (error) {
-            console.log(error);
+            return error
         }
+
+    }
+    async getToken(access_token: string) {
+        const newAccessToken = await this.oauth2Client.getAccessToken()
+        try {
+
+            const userInfo = await this.getUserInfo(String(newAccessToken.token))
+            const tokenInfo = await this.oauth2Client.getTokenInfo(String(newAccessToken.token))
+
+            return tokenInfo
+        } catch (error) {
+            const refresh_token = this.oauth2Client.refreshAccessToken()
+        }
+    }
+
+    async sandEmail() {
+        if (!this.is_authenticated) return new Error("you are not authenticated")
+        console.log('sanding email...');
+
+        /** CREATE EMAIL RAW AND SAND */
+             try {
+                 const options = {
+                     to: 'moccia.ant@gmail.com',
+                     cc: '',
+                     replyTo: '',
+                     subject: 'Hello Amit 🚀',
+                     text: 'This email is sent from the command line',
+                     html: `<p>🙋🏻‍♀️  &mdash; This is a <b>test email</b> from <a href="https://digitalinspiration.com">Digital Inspiration</a>.</p>`,
+                     textEncoding: 'base64',
+                     headers: [
+                         { key: 'X-Application-Developer', value: 'Amit Agarwal' },
+                         { key: 'X-Application-Version', value: 'v1.0.0.2' },
+                     ]
+                 }
+                 const rawMessage = await this.createMail(options);
+                 const sandEmail = await google.gmail({ version: 'v1', auth: this.oauth2Client }).users.messages.send({
+                     userId: 'me',
+                     requestBody: {
+                         raw: rawMessage
+                     }
+                 })
+     
+                 return sandEmail.status
+     
+             } catch (error) {
+                 console.log(error);
+             }
     }
 
     async getTokensByCode(code: string) {
@@ -103,12 +122,24 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
 
         try {
             const userInfo = await this.oauth2Client.getTokenInfo(authParams.access_token)
-          //  const token = await this.getToken(authParams.access_token)
+            //  const token = await this.getToken(authParams.access_token)
             this.is_authenticated = true
 
             return userInfo
         } catch (error) {
-            console.log(error);
+            const credentials: Auth.Credentials = await this.refreshToken()
+            this.oauth2Client.setCredentials({
+                access_token: credentials.access_token,
+                refresh_token: credentials.refresh_token
+            })
+            await this.updateService(this.id_service as string, { authParams: { access_token: credentials.access_token as string, refresh_token: credentials.refresh_token as string } })
+            await this.getServiceInfo()
+            const userInfo = await this.oauth2Client.getTokenInfo(authParams.access_token)
+            //  const token = await this.getToken(authParams.access_token)
+            console.log(userInfo);
+            
+            this.is_authenticated = true
+            return userInfo
         }
         return true
     }
@@ -129,8 +160,8 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
             scope: ['https://www.googleapis.com/auth/gmail.send', ' https://www.googleapis.com/auth/userinfo.email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile'],
             prompt: 'consent'
         })
-        return authUrl
 
+        return authUrl
 
     }
     async getUserInfo(access_token: string) {
@@ -147,5 +178,9 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
     }
 }
 
+export const data = {
+    name: 'gmail',
+    provider: 'gmail'
+}
 
 export default GoogleEmailService
