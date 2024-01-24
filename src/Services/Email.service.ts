@@ -28,11 +28,6 @@ class EmailService<AuthParams> extends EventEmitter {
 
     }
 
-    getBaseUrl():string | Error{
-        if(this.name=='') return new Error('add name property to your provider class')
-        return `/email/sand/${this.name}`
-    }
-
     sandMail() { }
     async createService(params: ServiceModel<AuthParams>): Promise<ServiceModel<AuthParams> | Error> {
         try {
@@ -44,7 +39,9 @@ class EmailService<AuthParams> extends EventEmitter {
             return new Error("Insert service error")
         }
     }
-
+    setIdService(id_service:string){
+        this.id_service = id_service
+    }
     async getServiceInfo() {
         try {
             const serviceInfo: ServiceModel<AuthParams> | null = await this.serviceRepository.findOne({

@@ -84,7 +84,7 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
             }
             const userInfo = await this.getUserInfo(this.oauth2Client.credentials.access_token as string)
             console.log(userInfo);
-
+            
             const rawMessage = await this.createMail(options);
             const sandEmail = await google.gmail({ version: 'v1', auth: this.oauth2Client }).users.messages.send({
                 userId: userInfo.id,
@@ -99,11 +99,13 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
             console.log(error);
         }
     }
+
     async getTokensByCode(code: string) {
         const tokens = await this.oauth2Client.getToken(code)
 
         return tokens
     }
+
     async updateService(id_service: string, params: CreateServiceParams): Promise<Services<AuthParamsGoogle> | Error> {
         try {
             const existingService = await this.serviceRepository.update({ id_service }, { email: params.email, provider: params.provider, authParams: params.authParams })
@@ -139,33 +141,33 @@ class GoogleEmailService extends EmailService<AuthParamsGoogle> {
             await this.getServiceInfo()
             const userInfo = await this.oauth2Client.getTokenInfo(credentials.access_token as string)
             //  const token = await this.getToken(authParams.access_token)
-
+         
 
             this.is_authenticated = true
             return userInfo
         }
         return true
     }
-
-    login() {
-        const authUrl = this.oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: ['https://www.googleapis.com/auth/gmail.send', ' https://www.googleapis.com/auth/userinfo.email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile'],
-            prompt: 'consent',
-        })
-
-        return authUrl
-    }
-    update(service_id?: string) {
-        const authUrl = this.oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: ['https://www.googleapis.com/auth/gmail.send', ' https://www.googleapis.com/auth/userinfo.email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile'],
-            prompt: 'consent',
-            state: JSON.stringify({
-                service_id
+    generateAuthUrl(service_id?: string) {
+        if (service_id) {
+            const authUrl = this.oauth2Client.generateAuthUrl({
+                access_type: 'offline',
+                scope: ['https://www.googleapis.com/auth/gmail.send', ' https://www.googleapis.com/auth/userinfo.email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+                prompt: 'consent',
+                state: JSON.stringify({
+                    service_id
+                })
             })
+            return authUrl
+        }
+        const authUrl = this.oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: ['https://www.googleapis.com/auth/gmail.send', ' https://www.googleapis.com/auth/userinfo.email', 'openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+            prompt: 'consent'
         })
+
         return authUrl
+
     }
     async getUserInfo(access_token: string) {
         try {

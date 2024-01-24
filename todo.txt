@@ -89,3 +89,18 @@ gmail
     @over
         sandEmail
         authenticate
+
+
+
+/****************************************************23/01/2024******************************************
+
+
+
+provider
+    /update
+        id_service: get auth url con il passaggio del parametro dello stato per passare l'id_service e la redirect vede se esiste questo oggetto e invece di fare la creazione sul database fa l'update
+    /sand-email
+        riceve come parametro l'id_service da utlizzare per prendere le informazioni
+    /login
+    /logout
+    /info

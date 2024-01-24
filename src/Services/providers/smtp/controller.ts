@@ -52,21 +52,9 @@ class GmailController implements ProviderController {
 
         res.json(sand)
     }
-    connect(req: Request, res: Response, next: NextFunction) {
-        const service = new GmailService()
-        const authUrl = service.login()
-
-        res.json({ url: authUrl })
-    }
     login(req: Request, res: Response, next: NextFunction) {
-        console.log(req);
-        
-        res.redirect(`${req.originalUrl}/login/connect`)
-    }
-
-    update(req: Request, res: Response, next: NextFunction) {
         const service = new GmailService()
-        const authUrl = service.update(req.query.id_service as string)
+        const authUrl = service.generateAuthUrl(req.query.id_service as string)
 
         res.json({ url: authUrl })
     }
