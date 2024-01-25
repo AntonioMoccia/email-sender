@@ -1,0 +1,6 @@
+{
+    "name": "gmail",
+    "id": "gmail_api",
+    "base": "gmail",
+    "type": "gmail"
+}

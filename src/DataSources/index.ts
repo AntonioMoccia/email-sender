@@ -1,5 +1,4 @@
-import Services from 'src/Entities/Services.entity'
-import User from 'src/Entities/User'
+import Services from '@Models/services.entity'
 import { DataSource } from 'typeorm'
 
 
@@ -9,10 +8,10 @@ export const database = new DataSource({
    port:5432,
    username: "admin",
    password: "admin",
-   database: "email_sander",
-   synchronize: false,
-   logging: false,
-   entities: [User,Services],
+   database: "email_sender",
+   synchronize: true,
+   logging: true,
+   entities: [Services],
    subscribers: [],
    migrations: [],
 })

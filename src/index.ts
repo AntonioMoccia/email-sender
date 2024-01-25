@@ -1,21 +1,19 @@
 import { config } from 'dotenv'
 config()
 import "reflect-metadata"
-import express, { Application, Request, Response, NextFunction } from 'express'
+import express, { Application, NextFunction, Request, Response } from 'express'
 import dns from 'dns'
 import { database } from "./DataSources"
-import Auth from "@Services/Auth.service"
-import path from 'path'
-import EmailRouter from '@Routers/Email.router'
-import ProviderManager from '@Services/ProviderManager'
+
 import cors from 'cors'
-import GmailProvider from '@Services/providers/gmail'
+
+import v1 from '@routers/v1/router'
 
 declare global {
     namespace Express {
         interface Request {
-            auth: Auth,
-            internalParams: any
+            auth: any,
+            providers: any
         }
     }
 }
@@ -25,40 +23,18 @@ app.use(cors())
 
 async function InitDatabase() {
     await database.initialize()
+    await database.synchronize()
 }
-/* 
-app.use('/email',EmailRouter) */
-
-
-const InitServicesMiddelware = async (req: Request, res: Response, next: NextFunction) => {
-    const auth = new Auth(req)
-    req.auth = auth
-    next()
-}
+InitDatabase()
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(InitServicesMiddelware)
-InitDatabase()
 
-
-
-const providerManager = new ProviderManager({ app })
-
-providerManager.use(GmailProvider)
-
-
+app.use('/v1', v1)
 
 const hosts: string[] = [
     'WP016.ekd.local'
 ]
-
-
-
-app.post('/sand-email', async (req: Request, res: Response) => {
-
-    res.send('hello world')
-})
 
 app.listen(5000, () => {
     console.log(`http://localhost:5000`);

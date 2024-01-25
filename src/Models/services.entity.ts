@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity({
     name: 'services'
 })
-class Services<T> {
+class Services {
 
     @PrimaryGeneratedColumn('uuid')
     id_service?: string
@@ -17,6 +17,6 @@ class Services<T> {
     provider: string
     
     @Column({ type: 'jsonb' })
-    authParams: T
+    authParams: any
 }
 export default Services

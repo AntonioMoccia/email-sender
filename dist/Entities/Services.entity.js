@@ -12,8 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 let Services = class Services {
     id_service;
-    service_type;
-    auth;
+    email;
+    provider;
+    authParams;
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
@@ -22,11 +23,17 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Services.prototype, "service_type", void 0);
+], Services.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'json' }),
+    (0, typeorm_1.Column)({
+        nullable: false
+    }),
+    __metadata("design:type", String)
+], Services.prototype, "provider", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'jsonb' }),
     __metadata("design:type", Object)
-], Services.prototype, "auth", void 0);
+], Services.prototype, "authParams", void 0);
 Services = __decorate([
     (0, typeorm_1.Entity)({
         name: 'services'

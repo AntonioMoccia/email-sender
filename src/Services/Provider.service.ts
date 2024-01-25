@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import ServiceModel from '@Entities/Services.entity'
+import ServiceModel from '@Models/services.entity'
 import { database } from "src/DataSources";
 import { Repository } from "typeorm";
 import MailComposer from 'nodemailer/lib/mail-composer'
@@ -8,28 +8,28 @@ type EmailServiceParams = {
     id_service?: string
 }
 
-class EmailService<AuthParams> extends EventEmitter {
+class EmailService extends EventEmitter {
 
 
     public provider: string
     public name: string
     public id_service?: string
-    public serviceModel: ServiceModel<AuthParams>
-    public serviceRepository: Repository<ServiceModel<AuthParams>>
+    public serviceModel: ServiceModel
+    public serviceRepository: Repository<ServiceModel>
 
 
     constructor({
 
     }: EmailServiceParams = {}) {
         super();
-        this.serviceModel = new ServiceModel<AuthParams>()
+        this.serviceModel = new ServiceModel()
         //      this.id_service = id_service ? id_service : undefined
-        this.serviceRepository = database.getRepository(ServiceModel<AuthParams>)
+        this.serviceRepository = database.getRepository(ServiceModel)
 
     }
 
     sandMail() { }
-    async createService(params: ServiceModel<AuthParams>): Promise<ServiceModel<AuthParams> | Error> {
+    async createService(params: ServiceModel): Promise<ServiceModel | Error> {
         try {
             this.serviceModel = { ...params }
             this.serviceModel.authParams = params.authParams
@@ -44,20 +44,22 @@ class EmailService<AuthParams> extends EventEmitter {
     }
     async getServiceInfo() {
         try {
-            const serviceInfo: ServiceModel<AuthParams> | null = await this.serviceRepository.findOne({
+            const serviceInfo: ServiceModel | null = await this.serviceRepository.findOne({
                 where: {
                     id_service: this.id_service
                 }
             })
             if (!serviceInfo) {
-                return new Error(`No info about ${this.id_service} service `)
+                throw new Error(`No info about ${this.id_service} service `)
             }
-            this.id_service = serviceInfo.id_service
+            this.setIdService(serviceInfo.id_service as string)
             this.provider = serviceInfo.provider
+    
+            
             return serviceInfo
 
         } catch (error) {
-            return new Error(`No info about ${this.id_service} service `)
+            throw new Error(`No info about ${this.id_service} service `)
         }
 
 
@@ -65,7 +67,7 @@ class EmailService<AuthParams> extends EventEmitter {
     encodeMessage(message: any) {
         return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     };
-    authenticate(_AuthParams: AuthParams): any {
+    authenticate(_AuthParams: any): any {
         return new Error("Override authenticate() method with your logic")
     }
     async createMail(options: any) {
