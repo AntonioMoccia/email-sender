@@ -1,6 +1,6 @@
 import { google, Auth } from "googleapis"
-import Services from "@Models/services.entity";
-import Provider from "@Services/Provider.service";
+import Services from "@models/mongo/services.model"
+import Provider from "@services/Provider.service";
 import { Application } from "express";
 
 const OAuth2 = google.auth.OAuth2;
@@ -15,6 +15,8 @@ class GmailProvider extends Provider {
     private oauth2Client: Auth.OAuth2Client
     public is_authenticated?: boolean
     public app: Application
+
+
 
     constructor({ id_service }: GoogleEmailServiceParams = {}) {
         super()
@@ -59,27 +61,33 @@ class GmailProvider extends Provider {
         }
 
     }
-    async updateService(id_service: string, params: any): Promise<Services | Error> {
+    async updateService(id_service: string, params: any) {
         try {
-            const existingService = await this.serviceRepository.update({ id_service }, { email: params.email, provider: params.provider, authParams:params.authParams })
+            const existingService = await Services.findOneAndUpdate({ id_service }, { ...params })
 
-            return existingService.raw
+            return existingService
 
         } catch (error) {
             return new Error("Update service error")
         }
     }
     async authenticate() {
+        console.log('serviceInfo');
         const serviceInfo = await this.getServiceInfo()
+
+        console.log('serviceInfo',serviceInfo);
         
-        
+
         if (!(serviceInfo instanceof Error)) {
             console.log('authentication...');
             const expire = serviceInfo.authParams.expires_in
-                    
+            this.oauth2Client.setCredentials({
+                access_token: serviceInfo.authParams.access_token,
+                refresh_token: serviceInfo.authParams.refresh_token
+            })
             if (expire - Date.now() < 0) {
                 const credentials: Auth.Credentials = await this.refreshToken()
-                console.log('serviceInfo,credentials');
+                console.log('serviceInfo',credentials);
                 this.oauth2Client.setCredentials({
                     access_token: credentials.access_token,
                     refresh_token: credentials.refresh_token
@@ -89,15 +97,13 @@ class GmailProvider extends Provider {
 
                 this.is_authenticated = true
             } else {
-                this.oauth2Client.setCredentials({
-                    access_token: serviceInfo.authParams.access_token,
-                    refresh_token: serviceInfo.authParams.refresh_token
-                })
                 this.is_authenticated = true
             }
         }
     }
     async sendEmail() {
+
+
         await this.authenticate()
 /*         if (!this.is_authenticated) {
         }
@@ -118,7 +124,7 @@ class GmailProvider extends Provider {
                 ]
             }
             const userInfo = await this.getUserInfo(this.oauth2Client.credentials.access_token as string)
-            console.log('userInfo',userInfo);
+            console.log('userInfo', userInfo);
 
             const rawMessage = await this.createMail(options);
             const sandEmail = await google.gmail({ version: 'v1', auth: this.oauth2Client }).users.messages.send({
@@ -134,15 +140,15 @@ class GmailProvider extends Provider {
             console.log(error);
         }
     }
-    async delete(id_service: string) {
-        try {
-            const deleted = await this.serviceRepository.delete({ id_service })
-            return deleted
-        } catch (error) {
-            throw new Error('Cannot delete this service')
-        }
-    }
-
+    /*   async delete(id_service: string) {
+          try {
+              const deleted = await this.serviceRepository.delete({ id_service })
+              return deleted
+          } catch (error) {
+              throw new Error('Cannot delete this service')
+          }
+      }
+   */
     async getUserInfo(access_token: string) {
         try {
             const url = `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`

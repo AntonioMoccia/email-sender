@@ -1,4 +1,4 @@
-import config from './config.json'
+
 import router from './router'
 import GoogleEmailService from './service'
 
@@ -9,15 +9,11 @@ type ProviderConfigProps = {
     version:string
 }
 
-
 class GmailProvider {
+    
     config: ProviderConfigProps
 
     constructor() {
-    }
-
-    init() {
-        this.config = config
     }
     getRouter() {
         return router
@@ -30,4 +26,5 @@ class GmailProvider {
     }
 
 }
+
 export default GmailProvider

@@ -15,6 +15,12 @@ export type GoogleEmailServiceProps = {
     redirect_uri: string,
     refresh_token: string
 }
+export type Service={
+    id_service: string,
+    email:string,
+    provider: string,
+    authParams: any
+}
 export interface EmailBase {
     sandEmail(): () => boolean
 }

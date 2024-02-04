@@ -16,6 +16,7 @@ class GmailController implements ProviderController {
     constructor() {
         this.gmailService = new GmailService()
     }
+    
     base(req: Request, res: Response, next: NextFunction) {
         res.send('Hello from Gmail Provider')
     }
@@ -44,19 +45,19 @@ class GmailController implements ProviderController {
         res.json({ url: authUrl })
     }
     async delete(req: Request, res: Response, next: NextFunction) {
-        const id_service = req.query.id_service
-        const service = new GmailService()
-        if (!id_service) {
-            res.sendStatus(404).end()
-        } else {
-            try {
-                await service.delete(id_service as string)
-                res.sendStatus(200)
-            } catch (error) {
-                res.sendStatus(500)
-            }
-        }
-
+        /*   const id_service = req.query.id_service
+             const service = new GmailService()
+             if (!id_service) {
+                 res.sendStatus(404).end()
+             } else {
+                 try {
+                     await service.delete(id_service as string)
+                     res.sendStatus(200)
+                 } catch (error) {
+                     res.sendStatus(500)
+                 }
+          }
+   */
     }
     async redirect(req: Request, res: Response, next: NextFunction) {
         const service_id = req.query.state ? JSON.parse(String(req.query.state)).service_id : undefined
@@ -65,7 +66,7 @@ class GmailController implements ProviderController {
         try {
             const resTokens = await gmailService.getTokensByCode(String(req.query.code))
             const userInfo = await gmailService.getUserInfo(String(resTokens.tokens.access_token))
-         
+
 
             if (service_id) {
                 gmailService.updateService(service_id, {

@@ -1,9 +1,11 @@
 import EventEmitter from "events";
-import ServiceModel from '@Models/services.entity'
-import { database } from "src/DataSources";
+import ServiceModel from '@models/services.entity'
+import { database } from "../data-sources";
 import { Repository } from "typeorm";
 import MailComposer from 'nodemailer/lib/mail-composer'
-
+import Services from '@models/mongo/services.model'
+import {v4 as uuid} from "uuid";
+import { Service } from "src/types";
 type EmailServiceParams = {
     id_service?: string
 }
@@ -12,28 +14,26 @@ class EmailService extends EventEmitter {
 
 
     public provider: string
-    public name: string
     public id_service?: string
-    public serviceModel: ServiceModel
-    public serviceRepository: Repository<ServiceModel>
+    name: string
+
 
 
     constructor({
 
     }: EmailServiceParams = {}) {
         super();
-        this.serviceModel = new ServiceModel()
-        //      this.id_service = id_service ? id_service : undefined
-        this.serviceRepository = database.getRepository(ServiceModel)
-
     }
 
     sandMail() { }
-    async createService(params: ServiceModel): Promise<ServiceModel | Error> {
+    async createService(params: ServiceModel): Promise<any> {
         try {
-            this.serviceModel = { ...params }
-            this.serviceModel.authParams = params.authParams
-            const newService = await this.serviceRepository.save(this.serviceModel)
+            const newServiceMongo = new Services({
+                id_service:uuid(),
+                ...params
+            })
+             const newService = await newServiceMongo.save()
+                
             return newService
         } catch (error) {
             return new Error("Insert service error")
@@ -44,11 +44,15 @@ class EmailService extends EventEmitter {
     }
     async getServiceInfo() {
         try {
-            const serviceInfo: ServiceModel | null = await this.serviceRepository.findOne({
+
+            const serviceInfo = await Services.findOne({id_service:this.id_service}).exec()
+            console.log('inside function',serviceInfo);
+            
+/*             const serviceInfo: ServiceModel | null = await this.serviceRepository.findOne({
                 where: {
                     id_service: this.id_service
                 }
-            })
+            }) */
             if (!serviceInfo) {
                 throw new Error(`No info about ${this.id_service} service `)
             }

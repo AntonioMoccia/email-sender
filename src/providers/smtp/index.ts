@@ -1,4 +1,3 @@
-import config from './config.json'
 import router from './router'
 import GoogleEmailService from './service'
 
@@ -16,9 +15,6 @@ class GmailProvider {
     constructor() {
     }
 
-    init() {
-        this.config = config
-    }
     getRouter() {
         return router
     }

@@ -1,4 +1,4 @@
-import Services from '@Models/services.entity'
+import Services from '@models/services.entity'
 import { DataSource } from 'typeorm'
 
 

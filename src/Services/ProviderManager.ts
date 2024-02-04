@@ -1,61 +1,55 @@
-import { Application } from "express"
+import { Application } from "express";
 import { Repository } from "typeorm";
-import ServiceModel from '@Models/services.entity'
-import { database } from "..//DataSources";
+import ServiceModel from "@models/services.entity";
+import { database } from "../data-sources";
 
-import Gmail from '@providers/gmail/service'
-
+import Gmail from "@providers/gmail/service";
+import SMTP from "@providers/smtp/service";
+import Services from "@models/mongo/services.model";
 
 class ProviderManager {
-    id_service:string
-    public serviceModel: ServiceModel
-    public serviceRepository: Repository<ServiceModel>
+  id_service: string;
+  public serviceModel: ServiceModel;
+  public serviceRepository: Repository<ServiceModel>;
 
-    constructor(){
-        this.serviceModel = new ServiceModel()
-        //      this.id_service = id_service ? id_service : undefined
-        this.serviceRepository = database.getRepository(ServiceModel)
+  constructor() {
+    this.serviceModel = new ServiceModel();
+    //      this.id_service = id_service ? id_service : undefined
+    this.serviceRepository = database.getRepository(ServiceModel);
+  }
+
+  private async getService() {
+    if (!this.id_service) {
+      throw new Error("id_service is undefined");
+    } else {
+      try {
+        const service = await Services.findOne({ id_service: this.id_service });
+        return service;
+      } catch (error) {
+        throw new Error(`No info about ${this.id_service} service `);
+      }
     }
+  }
+  setIdService(id_service: string) {
+    this.id_service = id_service;
+    return this;
+  }
 
-    private async getService(){
-        if(!this.id_service){
-            throw new Error('id_service is undefined')
-        }
-        else{
-            try {
-                const service = await this.serviceRepository.findOne({
-                    where:{
-                        id_service:this.id_service
-                    }
-                })
-                return service
-            } catch (error) {
-                throw new Error(`No info about ${this.id_service} service `)
-            }
-         
-        }
-    }
-    setIdService(id_service:string){
-        this.id_service = id_service
-        return this
-    }
+  async createProvider() {
 
-    async createProvider(){
-        console.log(this.id_service);
-        
-        const service = await this.getService()
-
-        switch(service?.provider){
-            case 'gmail':
-                return new Gmail({id_service:this.id_service})
-            
-        }
-    }
-
+    const service = await this.getService();
+    console.log('service',service);
+    
+    switch (service?.provider) {
+      case "gmail":
+        return new Gmail({ id_service: this.id_service });
+      case "smtp":
+        return new SMTP({id_service: this.id_service})
+      }
+  }
 }
 
-export default ProviderManager
-
+export default ProviderManager;
 
 /*    providers: any
    app: Application

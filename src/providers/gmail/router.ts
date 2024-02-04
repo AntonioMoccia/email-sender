@@ -6,9 +6,9 @@ const router = Router()
 
 router.get('/', gmailController.base)
 /**Sand email with provider authenticated */
-/* router.post('/sand-email', gmailController.sendEmail) */
+router.post('/sand-email', gmailController.sendEmail)
 /**Login routes */
-router.post('/login', gmailController.login) 
+router.get('/login', gmailController.login) 
 router.post('/update',gmailController.update) 
 router.delete('/delete',gmailController.delete)
 
